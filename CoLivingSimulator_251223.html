@@ -377,7 +377,6 @@
         let isDarkMode = false;
 
         window.onload = () => {
-            initMbtiSelect();
             initRoomSelect();
             renderCharacterList();
             renderLocations();
@@ -421,11 +420,6 @@
             });
 
             return replaced;
-        }
-
-        function calculateChemistry(mbti1, mbti2) {
-            if (!compatibilityData[mbti1] || !compatibilityData[mbti1][mbti2]) return 3;
-            return compatibilityData[mbti1][mbti2];
         }
 
         function getRelationshipLabel(score, specialStatus) {
@@ -627,7 +621,6 @@
                         group[i].interactionGroup = tId;
                         for(let j=0; j<group.length; j++) {
                             if(i === j) continue;
-                            const chem = calculateChemistry(group[i].mbti, group[j].mbti);
                             let change = getProbabilisticChange(chem);
                             if(change > 0) change += 2; 
                             updateRelationship(group[i].id, group[j].id, change);
@@ -644,7 +637,6 @@
 
 
             nonTravelers.forEach(char => {
-                const isExtrovert = char.mbti[0] === 'E';
                 const chanceToGoOut = isExtrovert ? 0.6 : 0.3;
                 
                 if (Math.random() < chanceToGoOut) {
@@ -779,7 +771,6 @@
                         const target = group[1];
                         
                         const evt = getRandom(EVENTS);
-                        const chemistryScore = calculateChemistry(actor.mbti, target.mbti);
                         const currentScore = actor.relationships[target.id] || 0;
                         const isLovers = actor.specialRelations?.[target.id] === 'lover';
                         const isMarried = actor.specialRelations?.[target.id] === 'married';
@@ -1012,7 +1003,6 @@
                                     const action = getRandom(actionPool);
 
                                     const processedText = fillTemplate(getRandom(action.text));
-                                    const chemistryScore = calculateChemistry(actor.mbti, target.mbti);
                                     
                                     updateRelationship(actor.id, target.id, getProbabilisticChange(chemistryScore));
                                     updateRelationship(target.id, actor.id, getProbabilisticChange(chemistryScore));
@@ -1058,7 +1048,7 @@
                                 group[i].currentAction = `함께 ${action.name}`;
                             for(let j=0; j<group.length; j++) {
                                 if(i === j) continue;
-                                const chem = calculateChemistry(group[i].mbti, group[j].mbti);
+                                const chem = Math.floor(Math.random() * 5) + 1;
                                 updateRelationship(group[i].id, group[j].id, getProbabilisticChange(chem));
                             }
                         }
@@ -1089,7 +1079,6 @@
         function addCharacter() {
             if (characters.length >= 30) return alert("최대 30명까지만 가능합니다.");
             const nameInput = document.getElementById('input-name');
-            const mbtiInput = document.getElementById('input-mbti');
             const roomInput = document.getElementById('input-room');
             const isMinorInput = document.getElementById('input-minor');
             
@@ -1111,7 +1100,6 @@
             characters.push({
                 id: Date.now().toString() + Math.random().toString(36).substring(2, 7),
                 name: name, 
-                mbti: mbtiInput.value, 
                 room: room,
                 isMinor: isMinorInput.checked,
                 group: selectedGroup,
